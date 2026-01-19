@@ -7,4 +7,5 @@ return [
     Modules\Auth\Providers\AuthServiceProvider::class,
     Modules\KategoriAduan\Providers\KategoriAduanServiceProvider::class,
     Modules\Aduan\Providers\AduanServiceProvider::class,
+    Modules\ODP\Providers\ODPServiceProvider::class,
 ];
