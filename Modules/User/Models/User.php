@@ -1,16 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace Modules\User\Models;
 
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticate
+class User extends Model
 {
-    use HasFactory, HasApiTokens, Notifiable;
+    use HasApiTokens;
 
     protected $table = 'users';
     protected $primaryKey = 'id_user';
@@ -23,7 +20,5 @@ class User extends Authenticate
 
     protected $hidden = [
         'password',
-        'remember_token',
     ];
-
 }
