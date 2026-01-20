@@ -18,10 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('id_user');
             $table->string('nama_kasus');
             $table->text('kronologi');
-            $table->string('nama_pengadu');
+            $table->string('nama_pengadu')->unique();
             $table->string('subjek_pelaku');
             $table->dateTime('waktu_kejadian');
-            $table->string('status_aduan')->default('sedang diproses');
+            $table->string('status_aduan')->default('Sedang diproses');
             $table->timestamps();
 
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');

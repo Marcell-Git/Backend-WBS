@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\BuktiAduan\Providers;
+namespace Modules\Hewan\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
-class BuktiAduanServiceProvider extends ServiceProvider
+class HewanServiceProvider extends ServiceProvider
 {
     public function boot()
     {

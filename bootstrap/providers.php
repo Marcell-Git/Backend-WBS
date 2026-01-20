@@ -8,4 +8,5 @@ return [
     Modules\KategoriAduan\Providers\KategoriAduanServiceProvider::class,
     Modules\Aduan\Providers\AduanServiceProvider::class,
     Modules\ODP\Providers\ODPServiceProvider::class,
+    Modules\BuktiAduan\Providers\BuktiAduanServiceProvider::class,
 ];
