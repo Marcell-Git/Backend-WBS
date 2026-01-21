@@ -23,9 +23,20 @@ class AduanService
 
     public function getAll()
     {
-        $Aduan = Aduan::all();
+        $Aduan = Aduan::paginate(10);
         return $Aduan;
     }
+
+    public function getSummary()
+    {
+        return response()->json([
+            'selesai' => Aduan::where('status_aduan', 'Selesai')->count(),
+            'diproses' => Aduan::where('status_aduan', 'Sedang diproses')->count(),
+            'diverifikasi' => Aduan::where('status_aduan', 'Sedang diverifikasi')->count(),
+            'ditolak' => Aduan::where('status_aduan', 'Ditolak')->count(),
+        ]);
+    }
+
 
     public function showDetail($id)
     {

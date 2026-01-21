@@ -23,6 +23,11 @@ class AduanController extends Controller
         return $this->aduanService->getAll();
     }
 
+    public function getSummary()
+    {
+        return $this->aduanService->getSummary();
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
