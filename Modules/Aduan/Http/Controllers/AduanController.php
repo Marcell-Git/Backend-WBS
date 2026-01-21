@@ -37,8 +37,7 @@ class AduanController extends Controller
             'waktu_kejadian' => 'required|date',
             'id_kategori' => 'required|integer',
             'id_unit' => 'required|integer',
-            'id_user' => 'required|integer',
-            'file' => 'nullable|array',
+            'file' => 'required|array',
             'file.*' => 'file|mimes:jpg,jpeg,png,pdf'
         ]);
 

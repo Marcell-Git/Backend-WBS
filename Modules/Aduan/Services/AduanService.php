@@ -4,6 +4,7 @@ namespace Modules\Aduan\Services;
 
 use Modules\Aduan\Models\Aduan;
 use Illuminate\support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 class AduanService
@@ -75,6 +76,8 @@ class AduanService
 
     public function create(array $data)
     {
+        $user = Auth::user();
+        $data['id_user'] = $user->id_user;
         $data['nama_pengadu'] = $this->generateAlias();
         return Aduan::create($data);
     }
