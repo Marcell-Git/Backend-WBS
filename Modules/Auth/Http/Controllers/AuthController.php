@@ -4,33 +4,39 @@ namespace Modules\Auth\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Modules\User\Models\User;
+use Modules\Auth\Services\AuthService;
 
 class AuthController extends Controller
 {
+    protected AuthService $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function login(Request $request)
     {
-        $user = User::where('name', $request->name)->first();
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Username atau Password Salah'
-            ], 401);
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $result = $this->authService->login(
+            $request->username,
+            $request->password
+        );
 
         return response()->json([
             'message' => 'Login berhasil',
-            'user' => $user,
-            'access_token' => $token,
+            'user' => $result['user'],
+            'access_token' => $result['token'],
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $this->authService->logout($request->user());
 
         return response()->json([
             'message' => 'Logout berhasil'

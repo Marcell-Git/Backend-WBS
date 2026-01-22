@@ -16,6 +16,9 @@ class BuktiAduan extends Model
     protected $fillable = [
         'id_aduan',
         'file_path',
+        'nama_file',
+        'jenis_file',
+        'ukuran',
     ];
 
     public function aduan()

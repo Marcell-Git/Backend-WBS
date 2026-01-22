@@ -80,6 +80,16 @@ class AduanController extends Controller
         ]);
     }
 
+    public function search($kode_tiket)
+    {
+        $aduan = $this->aduanService->search($kode_tiket);
+
+        return response()->json([
+            'message' => 'Pencarian Aduan berhasil',
+            'data' => $aduan
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $data = $request->all();

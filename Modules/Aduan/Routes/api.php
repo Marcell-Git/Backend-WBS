@@ -13,3 +13,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/aduan/{id}/status', [AduanController::class, 'updateStatus']);
     Route::delete('/aduan/{id}', [AduanController::class, 'destroy']);
 });
+
+Route::get('/aduan/search/{kode_tiket}', [AduanController::class, 'search']);

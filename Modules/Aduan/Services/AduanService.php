@@ -5,7 +5,7 @@ namespace Modules\Aduan\Services;
 use Modules\Aduan\Models\Aduan;
 use Illuminate\support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Str;
 
 class AduanService
 {
@@ -31,10 +31,11 @@ class AduanService
     public function getSummary()
     {
         return response()->json([
-            'selesai' => Aduan::where('status_aduan', 'Selesai')->count(),
-            'diproses' => Aduan::where('status_aduan', 'Sedang diproses')->count(),
+            'selesai' => Aduan::where('status_aduan', 'Aduan Selesai')->count(),
+            'penyidikan' => Aduan::where('status_aduan', 'Proses penyidikan')->count(),
             'diverifikasi' => Aduan::where('status_aduan', 'Sedang diverifikasi')->count(),
-            'ditolak' => Aduan::where('status_aduan', 'Ditolak')->count(),
+            'diproses' => Aduan::where('status_aduan', 'Sedang diproses')->count(),
+            'ditolak' => Aduan::where('status_aduan', 'Aduan Ditolak')->count(),
         ]);
     }
 
@@ -60,17 +61,42 @@ class AduanService
             ->first();
 
         if (!$aduan) {
-            return response()->json(['message' => 'Aduan tidak ditemukan'], 404);
+            return ['message' => 'Aduan tidak ditemukan'];
         }
 
         $bukti = DB::table('bukti_aduan')
             ->where('id_aduan', $id)
-            ->select('id_bukti_aduan', 'file_path')
+            ->select('file_path', 'nama_file', 'jenis_file', 'ukuran')
             ->get();
 
         $aduan->bukti_aduan = $bukti;
 
-        return response()->json($aduan);
+        return $aduan;
+    }
+
+    public function search($kode_tiket)
+    {
+        $aduan = DB::table('aduan')
+            ->join('kategori_aduan', 'aduan.id_kategori', '=', 'kategori_aduan.id_kategori')
+            ->join('odp', 'aduan.id_unit', '=', 'odp.id_unit')
+            ->select([
+                'aduan.kode_tiket',
+                'aduan.nama_kasus',
+                'aduan.kronologi',
+                'aduan.waktu_kejadian',
+                'aduan.status_aduan',
+                'aduan.created_at',
+                'kategori_aduan.nama_kategori',
+                'odp.nama_unit'
+            ])
+            ->where('aduan.kode_tiket', $kode_tiket)
+            ->first();
+
+        if (!$aduan) {
+            return ['message' => 'Aduan tidak ditemukan'];
+        }
+
+        return $aduan;
     }
 
 
@@ -79,6 +105,10 @@ class AduanService
         $user = Auth::user();
         $data['id_user'] = $user->id_user;
         $data['nama_pengadu'] = $this->generateAlias();
+        $kodeTiket = 'ADU-' . strtoupper(Str::random(4)) . '-' .
+             strtoupper(Str::random(4)) . '-' .
+             strtoupper(Str::random(2));
+        $data['kode_tiket'] = $kodeTiket;
         return Aduan::create($data);
     }
 

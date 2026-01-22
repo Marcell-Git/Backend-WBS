@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('id_user');
-            $table->string('name');
+            $table->unsignedBigInteger('id_unit');
+            $table->string('username');
             $table->string('password');
+            $table->string('nama_lengkap');
             $table->string('role');
             $table->timestamps();
+
+            $table->foreign('id_unit')->references('id_unit')->on('odp')->onDelete('cascade');
         });
     }
 

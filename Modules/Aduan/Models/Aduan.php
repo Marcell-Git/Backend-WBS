@@ -17,6 +17,7 @@ class Aduan extends Model
         'subjek_pelaku',
         'waktu_kejadian',
         'status_aduan',
+        'kode_tiket',
         'id_kategori',
         'id_unit',
         'id_user',

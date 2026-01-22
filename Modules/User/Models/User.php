@@ -13,9 +13,11 @@ class User extends Model
     protected $primaryKey = 'id_user';
 
     protected $fillable = [
-        'name',
+        'username',
         'password',
         'role',
+        'id_unit',
+        'nama_lengkap',
     ];
 
     protected $hidden = [

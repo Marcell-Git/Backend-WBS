@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id('id_bukti_aduan');
             $table->unsignedBigInteger('id_aduan');
             $table->string('file_path');
+            $table->string('nama_file');
+            $table->string('jenis_file');
+            $table->bigInteger('ukuran');
             $table->timestamps();
 
             $table->foreign('id_aduan')->references('id_aduan')->on('aduan')->onDelete('cascade');

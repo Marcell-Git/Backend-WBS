@@ -12,16 +12,20 @@ class UserSeeders extends Seeder
     {
         DB::table('users')->insert([
             [
-                'name' => 'Admin',
+                'username' => 'Admin',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'nama_lengkap' => 'Administrator',
+                'id_unit' => 13,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'User',
+                'username' => 'User',
                 'password' => Hash::make('password'),
+                'nama_lengkap' => 'User Name',
                 'role' => 'user',
+                'id_unit' => 13,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
