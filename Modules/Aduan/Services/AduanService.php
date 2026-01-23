@@ -7,6 +7,7 @@ use Illuminate\support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+
 class AduanService
 {
     protected function generateAlias(): string
@@ -22,10 +23,22 @@ class AduanService
         return $alias;
     }
 
-    public function getAll()
+    public function getAll($request)
     {
-        $Aduan = Aduan::paginate(10);
-        return $Aduan;
+        $query = DB::table('aduan')->select('*');
+
+        if($request->filled('search')){
+            $search = $request->search;
+
+            $query->where(function($q) use ($search){
+                $q->where('kode_tiket', 'like', "%$search%")
+                  ->orWhere('nama_pengadu', 'like', "%$search%")
+                  ->orWhere('status_aduan', 'like', "%$search%")
+                  ->orWhere('nama_kasus', 'like', "%$search%");
+            });
+        }
+
+        return $query->paginate(10);
     }
 
     public function getSummary()
@@ -44,18 +57,16 @@ class AduanService
     {
         $aduan = DB::table('aduan')
             ->join('kategori_aduan', 'aduan.id_kategori', '=', 'kategori_aduan.id_kategori')
-            ->join('odp', 'aduan.id_unit', '=', 'odp.id_unit')
+            ->join('pelaku', 'aduan.id_aduan', '=', 'pelaku.id_aduan')
             ->select([
                 'aduan.id_aduan',
                 'aduan.nama_kasus',
-                'aduan.kronologi',
                 'aduan.nama_pengadu',
-                'aduan.subjek_pelaku',
+                'kategori_aduan.nama_kategori',
+                'aduan.kronologi',
                 'aduan.waktu_kejadian',
                 'aduan.status_aduan',
                 'aduan.created_at',
-                'kategori_aduan.nama_kategori',
-                'odp.nama_unit'
             ])
             ->where('aduan.id_aduan', $id)
             ->first();
@@ -64,12 +75,19 @@ class AduanService
             return ['message' => 'Aduan tidak ditemukan'];
         }
 
+        $pelaku = DB::table('pelaku')
+            ->join('odp', 'pelaku.id_unit', 'odp.id_unit')
+            ->where('id_aduan', $id)
+            ->select('nama', 'jabatan', 'odp.nama_unit')
+            ->get();
+
         $bukti = DB::table('bukti_aduan')
             ->where('id_aduan', $id)
             ->select('file_path', 'nama_file', 'jenis_file', 'ukuran')
             ->get();
 
         $aduan->bukti_aduan = $bukti;
+        $aduan->pelaku = $pelaku;
 
         return $aduan;
     }
@@ -106,8 +124,8 @@ class AduanService
         $data['id_user'] = $user->id_user;
         $data['nama_pengadu'] = $this->generateAlias();
         $kodeTiket = 'ADU-' . strtoupper(Str::random(4)) . '-' .
-             strtoupper(Str::random(4)) . '-' .
-             strtoupper(Str::random(2));
+            strtoupper(Str::random(4)) . '-' .
+            strtoupper(Str::random(2));
         $data['kode_tiket'] = $kodeTiket;
         return Aduan::create($data);
     }

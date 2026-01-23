@@ -7,20 +7,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Aduan\Services\AduanService;
 use Modules\BuktiAduan\Services\BuktiAduanService;
+use Modules\Pelaku\Services\PelakuService;
 
 class AduanController extends Controller
 {
     protected $aduanService;
     protected $buktiAduanService;
-    public function __construct(AduanService $aduanService, BuktiAduanService $buktiAduanService)
+    protected $pelakuService;
+
+    public function __construct(AduanService $aduanService, BuktiAduanService $buktiAduanService, PelakuService $pelakuService)
     {
         $this->aduanService = $aduanService;
         $this->buktiAduanService = $buktiAduanService;
+        $this->pelakuService = $pelakuService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return $this->aduanService->getAll();
+        return $this->aduanService->getAll($request);
     }
 
     public function getSummary()
@@ -33,17 +37,25 @@ class AduanController extends Controller
         $validated = $request->validate([
             'nama_kasus' => 'required|string|max:255',
             'kronologi' => 'required|string',
-            'subjek_pelaku' => 'required|string|max:255',
             'waktu_kejadian' => 'required|date',
             'id_kategori' => 'required|integer',
-            'id_unit' => 'required|integer',
+            'pelaku' => 'required|array',
+            'pelaku.*.nama' => 'required|string|max:255',
+            'pelaku.*.jabatan' => 'required|string',
+            'pelaku.*.id_unit' => 'required|integer',
             'file' => 'required|array',
             'file.*' => 'file|mimes:jpg,jpeg,png,pdf'
         ]);
 
-        $aduan = $this->aduanService->create(
-            $request->except('file')
-        );
+
+        $dataAduan = $request->except(['file', 'pelaku']);
+
+        $aduan = $this->aduanService->create($dataAduan);
+
+
+        foreach ($validated['pelaku'] as $pelakuData) {
+            $this->pelakuService->create($pelakuData, $aduan->id_aduan);
+        }
 
         if ($request->hasFile('file')) {
             foreach ($request->file('file') as $file) {
@@ -55,7 +67,7 @@ class AduanController extends Controller
         }
         return response()->json([
             'message' => 'Aduan berhasil dibuat',
-            'data' => $aduan->load('buktiAduan')
+            'data' => $aduan->load('pelaku', 'buktiAduan')
         ], 201);
     }
 

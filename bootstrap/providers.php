@@ -9,4 +9,5 @@ return [
     Modules\Aduan\Providers\AduanServiceProvider::class,
     Modules\ODP\Providers\ODPServiceProvider::class,
     Modules\BuktiAduan\Providers\BuktiAduanServiceProvider::class,
+    Modules\Pelaku\Providers\PelakuServiceProvider::class,
 ];

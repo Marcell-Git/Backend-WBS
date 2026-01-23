@@ -14,12 +14,10 @@ return new class extends Migration
         Schema::create('aduan', function (Blueprint $table) {
             $table->id('id_aduan');
             $table->unsignedBigInteger('id_kategori');
-            $table->unsignedBigInteger('id_unit');
             $table->unsignedBigInteger('id_user');
             $table->string('nama_kasus');
             $table->text('kronologi');
             $table->string('nama_pengadu')->unique();
-            $table->string('subjek_pelaku');
             $table->dateTime('waktu_kejadian');
             $table->string('status_aduan')->default('Sedang diverifikasi');
             $table->string('kode_tiket')->unique();
@@ -27,7 +25,6 @@ return new class extends Migration
 
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
             $table->foreign('id_kategori')->references('id_kategori')->on('kategori_aduan')->onDelete('cascade');
-            $table->foreign('id_unit')->references('id_unit')->on('odp')->onDelete('cascade');
         });
     }
 
