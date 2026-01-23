@@ -2,6 +2,7 @@
 
 namespace Modules\User\Services;
 
+use Illuminate\Support\Facades\DB;
 use Modules\User\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,16 +24,55 @@ class UserService
         ]);
     }
 
-    public function findById($id)
+    public function showUser($request)
     {
-        return User::findOrFail($id);
+        $query = DB::table('users')
+            ->join('odp', 'users.id_unit', '=', 'odp.id_unit')
+            ->select(
+                'users.id_user',
+                'users.username',
+                'users.nama_lengkap',
+                'users.role',
+                'odp.nama_unit'
+            );
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('users.username', 'like', "%$search%")
+                    ->orWhere('users.nama_lengkap', 'like', "%$search%")
+                    ->orWhere('odp.nama_unit', 'like', "%$search%");
+            });
+        }
+        return $query->paginate(10);
     }
 
-    public function update($id, array $data)
+    public function findById($id)
+    {
+        $user = DB::table('users')
+            ->join('odp', 'users.id_unit', '=', 'odp.id_unit')
+            ->select([
+                'users.id_user',
+                'users.username',
+                'users.nama_lengkap',
+                'users.role',
+                'odp.nama_unit'
+            ])
+            ->where('users.id_user', $id)
+            ->first();
+
+        return $user;
+    }
+
+    public function updatePassword($id, $password)
     {
         $user = User::findOrFail($id);
-        $user->update($data);
-        return $user;
+        $user->update(['password' => Hash::make($password)]);
+        return response()->json([
+            'message' => 'Password berhasil diupdate',
+            'data' => $user
+        ]);
     }
 
     public function delete($id)

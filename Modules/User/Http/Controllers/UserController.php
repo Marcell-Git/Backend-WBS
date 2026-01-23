@@ -27,9 +27,19 @@ class UserController extends Controller
         return $this->service->findById($id);
     }
 
-    public function update(Request $request, $id)
+    public function showUser(Request $request)
     {
-        return $this->service->update($id, $request->all());
+        return $this->service->showUser($request);
+    }
+
+    public function search($id)
+    {
+        return $this->service->findById($id);
+    }
+
+    public function updatePassword(Request $request, $id)
+    {
+        return $this->service->updatePassword($id, $request);
     }
 
     public function destroy($id)
