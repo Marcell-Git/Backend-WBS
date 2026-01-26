@@ -12,9 +12,23 @@ class ODPController extends Controller
         protected ODPService $service
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        return $this->service->getAll();
+        return $this->service->getAll($request);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama_unit' => 'required|string|max:255',
+        ]);
+
+        return $this->service->create($validated);
+    }
+
+    public function destroy($id)
+    {
+        return $this->service->destroy($id);
     }
 
 }

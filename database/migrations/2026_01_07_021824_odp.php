@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('odp', function (Blueprint $table) {
             $table->id('id_unit');
             $table->string('nama_unit');
+            $table->softDeletes();
+
+            $table->timestamps();
         });
     }
 

@@ -18,11 +18,15 @@ class AuthService
             ]);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken(
+            'auth_token',
+            ['*'],
+            now()->addHours(2)
+        );
 
         return [
             'user' => $user,
-            'token' => $token,
+            'token' => $token->plainTextToken,
         ];
     }
 
