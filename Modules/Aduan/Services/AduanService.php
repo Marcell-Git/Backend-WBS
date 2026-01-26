@@ -96,7 +96,6 @@ class AduanService
     {
         $aduan = DB::table('aduan')
             ->join('kategori_aduan', 'aduan.id_kategori', '=', 'kategori_aduan.id_kategori')
-            ->join('odp', 'aduan.id_unit', '=', 'odp.id_unit')
             ->select([
                 'aduan.kode_tiket',
                 'aduan.nama_kasus',
@@ -105,7 +104,6 @@ class AduanService
                 'aduan.status_aduan',
                 'aduan.created_at',
                 'kategori_aduan.nama_kategori',
-                'odp.nama_unit'
             ])
             ->where('aduan.kode_tiket', $kode_tiket)
             ->first();

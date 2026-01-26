@@ -8,9 +8,9 @@ use Modules\ODP\Models\ODP;
 
 class ODPService
 {
-    public function getAll($request)
+    public function getAllPaginate($request)
     {
-        $query = DB::table('odp')->select('*');
+        $query = DB::table('odp')->select('*')->where('deleted_at', null);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -21,6 +21,13 @@ class ODPService
         }
 
         return $query->paginate(10);
+    }
+
+    public function getAll()
+    {
+        $query = DB::table('odp')->select('*')->where('deleted_at', null);
+
+        return $query->get();
     }
 
     public function create(array $data)

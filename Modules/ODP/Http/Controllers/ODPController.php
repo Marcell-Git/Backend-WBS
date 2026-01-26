@@ -14,7 +14,12 @@ class ODPController extends Controller
 
     public function index(Request $request)
     {
-        return $this->service->getAll($request);
+        return $this->service->getAllPaginate($request);
+    }
+
+    public function getAll()
+    {
+        return $this->service->getAll();
     }
 
     public function store(Request $request)
