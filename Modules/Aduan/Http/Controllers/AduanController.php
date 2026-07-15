@@ -34,41 +34,69 @@ class AduanController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nama_kasus' => 'required|string|max:255',
-            'kronologi' => 'required|string',
-            'waktu_kejadian' => 'required|date',
-            'id_kategori' => 'required|integer',
-            'pelaku' => 'required|array',
-            'pelaku.*.nama' => 'required|string|max:255',
-            'pelaku.*.jabatan' => 'required|string',
-            'pelaku.*.id_unit' => 'required|integer',
-            'file' => 'required|array',
-            'file.*' => 'file|mimes:jpg,jpeg,png,pdf'
-        ]);
+        try {
+            $validated = $request->validate([
+                'nama_kasus' => 'required|string|max:255',
+                'kronologi' => 'required|string|min:10',
+                'waktu_kejadian' => 'required|date',
+                'id_kategori' => 'required|integer|exists:kategori_aduan,id_kategori',
+                'pelaku' => 'required|array|min:1',
+                'pelaku.*.nama' => 'required|string|max:255',
+                'pelaku.*.jabatan' => 'required|string',
+                'pelaku.*.id_unit' => 'required|integer|exists:odp,id_unit',
+                'file' => 'required|array|min:1',
+                'file.*' => 'file|mimes:jpg,jpeg,png,pdf|max:5120',
+            ], [
+                'file.required' => 'Bukti aduan wajib diunggah.',
+                'file.array' => 'Bukti aduan harus berupa array.',
+                'file.min' => 'Minimal harus mengunggah 1 file bukti aduan.',
+                'file.*.file' => 'File yang diunggah harus berupa file yang valid.',
+                'file.*.mimes' => 'Format file tidak didukung. Hanya boleh JPG, JPEG, PNG, atau PDF.',
+                'file.*.max' => 'Ukuran file maksimal 5MB (5120KB). File yang diunggah terlalu besar.',
+                'pelaku.required' => 'Data pelaku wajib diisi.',
+                'pelaku.min' => 'Minimal harus ada 1 pelaku.',
+                'pelaku.*.nama.required' => 'Nama pelaku wajib diisi.',
+                'pelaku.*.jabatan.required' => 'Jabatan pelaku wajib diisi.',
+                'pelaku.*.id_unit.required' => 'Unit kerja pelaku wajib diisi.',
+                'pelaku.*.id_unit.exists' => 'Unit kerja yang dipilih tidak valid.',
+                'id_kategori.required' => 'Kategori aduan wajib dipilih.',
+                'id_kategori.exists' => 'Kategori aduan yang dipilih tidak valid.',
+                'nama_kasus.required' => 'Nama kasus wajib diisi.',
+                'kronologi.required' => 'Kronologi kejadian wajib diisi.',
+                'kronologi.min' => 'Kronologi kejadian minimal 10 karakter.',
+                'waktu_kejadian.required' => 'Waktu kejadian wajib diisi.',
+                'waktu_kejadian.date' => 'Format waktu kejadian tidak valid.',
+            ]);
 
+            $dataAduan = $request->except(['file', 'pelaku']);
 
-        $dataAduan = $request->except(['file', 'pelaku']);
+            $aduan = $this->aduanService->create($dataAduan);
 
-        $aduan = $this->aduanService->create($dataAduan);
-
-
-        foreach ($validated['pelaku'] as $pelakuData) {
-            $this->pelakuService->create($pelakuData, $aduan->id_aduan);
-        }
-
-        if ($request->hasFile('file')) {
-            foreach ($request->file('file') as $file) {
-                $this->buktiAduanService->store(
-                    $aduan->id_aduan,
-                    $file
-                );
+            foreach ($validated['pelaku'] as $pelakuData) {
+                $this->pelakuService->create($pelakuData, $aduan->id_aduan);
             }
+
+            if ($request->hasFile('file')) {
+                foreach ($request->file('file') as $file) {
+                    $this->buktiAduanService->store(
+                        $aduan->id_aduan,
+                        $file
+                    );
+                }
+            }
+
+            return response()->json([
+                'message' => 'Aduan berhasil dibuat',
+                'data' => $aduan->load('pelaku', 'buktiAduan')
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal membuat aduan',
+                'errors' => ['server' => [$e->getMessage()]]
+            ], 500);
         }
-        return response()->json([
-            'message' => 'Aduan berhasil dibuat',
-            'data' => $aduan->load('pelaku', 'buktiAduan')
-        ], 201);
     }
 
 
